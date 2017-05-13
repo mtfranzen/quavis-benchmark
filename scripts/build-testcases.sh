@@ -1,37 +1,49 @@
 #!/bin/bash
 TEST_CASES_PATH=data/test-cases
-rm $TEST_CASES_PATH/*
 
-# OCTAHEDRON - TODO: Add rotation
-OCTAHEDRON_RADIUS=100.0
-OCTAHEDRON_ROTATION_THETA=0
-OCTAHEDRON_ROTATION_PHI=0
+OCTAHEDRON_RADIUS="50 100"
+OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(5)]))")
+OCTAHEDRON_THETA_Y=0
+OCTAHEDRON_THETA_Z=0
 
-FILENAME=octahedron.$OCTAHEDRON_RADIUS.$OCTAHEDRON_ROTATION_THETA.$OCTAHEDRON_ROTATION_PHI.obj
-OBJ_PATH=$TEST_CASES_PATH/$FILENAME
-
-# vertices
-for i in $OCTAHEDRON_RADIUS -$OCTAHEDRON_RADIUS
+for R in $OCTAHEDRON_RADIUS
 do
-  echo "v" $i 0 0 >> $OBJ_PATH
-  echo "v" 0 $i 0 >> $OBJ_PATH
-  echo "v" 0 0 $i >> $OBJ_PATH
-done
-
-# faces
-for i in 1 4
-do
-  for j in 2 5
+  for TX in $OCTAHEDRON_THETA_X
   do
-    for k in 3 6
+    for TY in $OCTAHEDRON_THETA_Y
     do
-      echo "f" $i $j $k > $OBJ_PATH
+      for TZ in $OCTAHEDRON_THETA_Z
+      do
+        FILENAME=octahedron.$R.$TX.$TY.$TZ.obj
+        OBJ_PATH=$TEST_CASES_PATH/$FILENAME
+        rm -f $OBJ_PATH* > /dev/null
+
+        # vertices
+        for i in $R -$R
+        do
+          echo v $(python -c "from math import *;print $i*cos($TY)*cos($TZ), $i*(cos($TX)*sin($TZ)+sin($TX)*sin($TY)*cos($TZ)), $i*(sin($TX)*sin($TZ)-cos($TX)*sin($TY)*cos($TZ))") >> $OBJ_PATH
+          echo v $(python -c "from math import *;print $i*-cos($TY)*sin($TZ), $i*(cos($TX)*cos($TZ)-sin($TX)*sin($TY)*sin($TZ)), $i*(sin($TX)*cos($TZ)+cos($TX)*sin($TY)*sin($TZ))") >> $OBJ_PATH
+          echo v $(python -c "from math import *;print $i*sin($TY), $i*-sin($TX)*cos($TY), $i*cos($TX)*cos($TY)") >> $OBJ_PATH
+        done
+
+        # faces
+        for i in 1 4
+        do
+          for j in 2 5
+          do
+            for k in 3 6
+            do
+              echo "f" $i $j $k >> $OBJ_PATH
+            done
+          done
+        done
+
+        # observation points
+        echo "0 0 0" >> $OBJ_PATH.in
+
+        # correct result
+        echo $(python -c "import math;print math.sqrt(2)/3.0*$R*$R*$R") >> $OBJ_PATH.out
+      done
     done
   done
 done
-
-# observation points
-echo "0 0 0" >> $OBJ_PATH.in
-
-# correct result
-echo $(python -c "import math;print math.sqrt(2)/3.0*$OCTAHEDRON_RADIUS*$OCTAHEDRON_RADIUS*$OCTAHEDRON_RADIUS") >> $OBJ_PATH.out
