@@ -1,4 +1,5 @@
-#!/bin/sh
-sh scripts/build-quavis
-sh scripts/build-shaders
-sh scripts/build-testcases
+#!/bin/bash
+
+bash scripts/build-quavis.sh
+bash scripts/build-shaders.sh
+bash scripts/build-testcases.sh
