@@ -1,0 +1,10 @@
+[submodule "spherical"]
+	path = quavis/spherical
+	url = https://github.com/mtfranzen/qua-vis-services.git
+	branch = standalone
+	ignore=dirty
+[submodule "cube"]
+	path = quavis/cube
+	url = https://github.com/mtfranzen/qua-vis-services.git
+	branch = standalone-cubemap
+  ignore=dirty
