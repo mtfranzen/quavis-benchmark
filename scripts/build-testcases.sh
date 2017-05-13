@@ -1,7 +1,7 @@
 #!/bin/bash
 TEST_CASES_PATH=data/test-cases
 
-OCTAHEDRON_RADIUS="50 100"
+OCTAHEDRON_RADIUS="1 50 100"
 OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(5)]))")
 OCTAHEDRON_THETA_Y=0
 OCTAHEDRON_THETA_Z=0
@@ -42,7 +42,9 @@ do
         echo "0 0 0" >> $OBJ_PATH.in
 
         # correct result
-        echo $(python -c "import math;print math.sqrt(2)/3.0*$R*$R*$R") >> $OBJ_PATH.out
+        A=$(python -c "import math;print math.sqrt(2)*$R") # edge length
+        echo 0 0 0 $(python -c "import math;print 2*math.sqrt(3.0)*$A*$A") >> $OBJ_PATH.area.out
+        echo 0 0 0 $(python -c "import math;print math.sqrt(2)/3.0*$A*$A*$A") >> $OBJ_PATH.volume.out
       done
     done
   done
