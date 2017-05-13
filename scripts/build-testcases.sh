@@ -26,6 +26,9 @@ do
           echo v $(python -c "from math import *;print $i*sin($TY), $i*-sin($TX)*cos($TY), $i*cos($TX)*cos($TY)") >> $OBJ_PATH
         done
 
+        # TODO normals
+        echo vn 0.0 0.0 0.0 >> $OBJ_PATH
+
         # faces
         for i in 1 4
         do

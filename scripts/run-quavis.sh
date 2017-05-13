@@ -19,6 +19,7 @@ ALPHAS="0.01"
 REPEATS=1
 RMAX=10000
 
+
 for function in $FUNCTIONS
 do
     for alpha in $ALPHAS
