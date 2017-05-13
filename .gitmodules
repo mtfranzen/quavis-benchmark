@@ -7,4 +7,4 @@
 	path = quavis/cube
 	url = https://github.com/mtfranzen/qua-vis-services.git
 	branch = standalone-cubemap
-  ignore=dirty
+	ignore=dirty
