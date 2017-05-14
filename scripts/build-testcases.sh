@@ -1,10 +1,10 @@
 #!/bin/bash
 TEST_CASES_PATH=data/test-cases
 
-OCTAHEDRON_RADIUS="1 50 100"
-OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(5)]))")
-OCTAHEDRON_THETA_Y=0
-OCTAHEDRON_THETA_Z=0
+OCTAHEDRON_RADIUS="1 20 50"
+OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
+OCTAHEDRON_THETA_Y=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
+OCTAHEDRON_THETA_Z=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
 
 for R in $OCTAHEDRON_RADIUS
 do
