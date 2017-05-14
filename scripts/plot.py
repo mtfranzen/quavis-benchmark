@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-
+print sns.__version__
 OUT_PATH="output/plots/"
 
 if __name__ == '__main__':
@@ -12,24 +12,21 @@ if __name__ == '__main__':
 
     df_spherical = df[df["MAPPING"] == "SPHERICAL"]
     df_cube = df[df["MAPPING"] == "CUBE"]
+    df2 = df.fillna(0)
 
-    for obj in np.unique(df_spherical["OBJ"].values):
-        df_obj = df_spherical[df_spherical["OBJ"] == obj]
+    plt.clf()
+    ax = sns.pairplot(df2[["MAPPING", "ALPHA", "GRAPHICS_FPS", "COMPUTE_FPS", "FUNCTION", "ERROR"]], hue="MAPPING", diag_kind="kde", dropna=True)
+    ax.title = (r"Pair Plot")
+    ax.savefig(OUT_PATH + "all_all.png")
 
-        plt.clf()
-        ax = sns.lmplot(x="ALPHA", y="GRAPHICS_FPS", hue="FUNCTION", data=df_obj)
-        ax.title = (str.format(r"{0} - $\alpha_\max$ vs. GFPS", obj))
-        plt.savefig(OUT_PATH + str.format(r"{0}_alpha_v_GFPS.png", obj))
-
-        plt.clf()
-        ax = sns.lmplot(x="ALPHA", y="COMPUTE_FPS", hue="FUNCTION", data=df_obj)
-        ax.title = (str.format(r"{0} - $\alpha_\max$ vs. CFPS", obj))
-        plt.savefig(OUT_PATH + str.format(r"{0}_alpha_v_CFPS.png", obj))
+    for obj in np.unique(df["OBJ"].values):
+        df_obj = df[df["OBJ"] == obj]
+        df_obj2 = df_obj.fillna(0)
 
         plt.clf()
-        ax = sns.lmplot(x="ALPHA", y="ERROR", hue="FUNCTION", data=df_obj)
-        ax.title = (str.format(r"{0} - $\alpha_\max$ vs. error", obj))
-        plt.savefig(OUT_PATH + str.format(r"{0}_alpha_v_ERR.png", obj))
+        ax = sns.pairplot(df_obj2[["MAPPING", "ALPHA", "GRAPHICS_FPS", "COMPUTE_FPS", "FUNCTION", "ERROR"]], hue="MAPPING", diag_kind="kde", dropna=True)
+        ax.title = (str.format(r"{0} - Pair Plot", obj))
+        ax.savefig(OUT_PATH + str.format(r"{0}_all.png", obj))
 
     plt.clf()
     ax = sns.boxplot(x="MAPPING", y="GRAPHICS_FPS", hue="FUNCTION", data=df)
