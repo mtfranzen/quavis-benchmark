@@ -46,7 +46,7 @@ do
 
         # correct result
         A=$(python -c "import math;print math.sqrt(2)*$R") # edge length
-        echo 0 0 0 $(python -c "import math;print 2*math.sqrt(3.0)*$A*$A") >> $OBJ_PATH.area.out
+        echo 0 0 0 $(python -c "import math;print 4*math.pi") >> $OBJ_PATH.spherical_area.out
         echo 0 0 0 $(python -c "import math;print math.sqrt(2)/3.0*$A*$A*$A") >> $OBJ_PATH.volume.out
       done
     done
