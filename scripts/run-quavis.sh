@@ -13,7 +13,7 @@ OUTPUT_FILE=output/output.csv
 FUNCTIONS="spherical_area volume"
 
 # arguments
-RMAX="10" # DO NOT CHANGE THIS!
+RMAX="10000" # DO NOT CHANGE THIS!
 ALPHAS="0.01"
 GEOM_OFF="0"
 TESS_OFF="0"
