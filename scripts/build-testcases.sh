@@ -17,7 +17,7 @@ echo 0 0 0 0.0826248813482 >> $OBJ_PATH.spherical_area.out
 echo 0 0 0 0 >> $OBJ_PATH.volume.out
 
 # OCTAHEDRON TEST CASE
-OCTAHEDRON_RADIUS="1"
+OCTAHEDRON_RADIUS="10"
 OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
 OCTAHEDRON_THETA_Y=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
 OCTAHEDRON_THETA_Z=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")

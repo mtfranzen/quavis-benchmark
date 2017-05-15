@@ -86,7 +86,7 @@ do
           echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
           workgroups=$width
           EXPECTED=$(cat $testcase.$function.out | sed "s/ /;/g")
-          RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/$function.1.comp.spv -d 1 -t $CUBE_SHADERS_PATH/$function.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
+          RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/$function.1.comp.spv -t $CUBE_SHADERS_PATH/$function.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
           paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
           do
             echo "CUBE;$function;${testcase##*/};$width;$repeat;$rmax;;;;;$line" >> $OUTPUT_FILE

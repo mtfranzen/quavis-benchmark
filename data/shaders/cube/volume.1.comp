@@ -11,7 +11,7 @@
 #define R_MIN 0.001
 #define R_MAX 10000.0
 #define CHUNKSIZE 32 // WIDTH / N_LOCAL
-#define INVHEIGHTPI 0.04908738521234052 // PI / HEIGHT
+#define INVHEIGHTPI 0.00613592315// PI / HEIGHT
 
 layout (local_size_x = N_LOCAL, local_size_y = 1, local_size_z = 1) in;
 
@@ -33,21 +33,27 @@ shared float tmp_local[N_LOCAL];
 
 void main()
 {
-  float weight = 4.0/3.0*PI*R_MAX*R_MAX/(6*WIDTH*HEIGHT);
-
   // compute sum per item
   uint xpos = gl_LocalInvocationID.x * CHUNKSIZE;
   float tmp = 0.0;
   for (uint x = xpos; x < xpos + CHUNKSIZE; x++) {
-    float tmp2 = imageLoad(inputImage0, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp2 += imageLoad(inputImage1, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp2 += imageLoad(inputImage2, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp2 += imageLoad(inputImage3, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp2 += imageLoad(inputImage4, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp2 += imageLoad(inputImage5, ivec2(x, gl_WorkGroupID.x)).x;
-    tmp += tmp2;
+      float i,j,n,m;
+      i = float(x);
+      j = float(gl_WorkGroupID.x);
+      n = float(WIDTH);
+      m = float(HEIGHT);
+      float weight = 4.0f/n/m/sqrt(pow((3.0f + 4.0f*j*(j-m)/m/m + 4.0f*i*(i-n)/n/n), 3.0f))/3.0f;
+
+      float d0 = pow(R_MAX*imageLoad(inputImage0, ivec2(x, gl_WorkGroupID.x)).x,2);
+      float d1 = pow(R_MAX*imageLoad(inputImage1, ivec2(x, gl_WorkGroupID.x)).x,2);
+      float d2 = pow(R_MAX*imageLoad(inputImage2, ivec2(x, gl_WorkGroupID.x)).x,2);
+      float d3 = pow(R_MAX*imageLoad(inputImage3, ivec2(x, gl_WorkGroupID.x)).x,2);
+      float d4 = pow(R_MAX*imageLoad(inputImage4, ivec2(x, gl_WorkGroupID.x)).x,2);
+      float d5 = pow(R_MAX*imageLoad(inputImage5, ivec2(x, gl_WorkGroupID.x)).x,2);
+
+      tmp += (d0+d1+d2+d3+d4+d5)*weight;
   }
-  tmp_local[gl_LocalInvocationID.x] = tmp*weight;
+  tmp_local[gl_LocalInvocationID.x] = tmp;
   barrier();
 
   // group sum
