@@ -1,17 +1,8 @@
-#version 450
-// image settings
-#define WIDTH 512 // each work item covers a patch of size (W/N)x(H/M)
-#define HEIGHT 512
-
-// local dimensions
-#define N_LOCAL 16 // the number of local work items on the x-axis
+// WIDTH, HEIGHT, R_MAX are defined automatically
 
 // constants
+#define N_LOCAL 16
 #define PI 3.1415926
-#define R_MIN 0.001
-#define R_MAX 10000.0
-#define CHUNKSIZE 32 // WIDTH / N_LOCAL
-#define INVHEIGHTPI 0.00613592315// PI / HEIGHT
 
 layout (local_size_x = N_LOCAL, local_size_y = 1, local_size_z = 1) in;
 
@@ -33,10 +24,12 @@ shared float tmp_local[N_LOCAL];
 
 void main()
 {
+  uint chunksize = WIDTH/N_LOCAL;
+
   // compute sum per item
-  uint xpos = gl_LocalInvocationID.x * CHUNKSIZE;
+  uint xpos = gl_LocalInvocationID.x * chunksize;
   float tmp = 0.0;
-  for (uint x = xpos; x < xpos + CHUNKSIZE; x++) {
+  for (uint x = xpos; x < xpos + chunksize; x++) {
       float i,j,n,m;
       i = float(x);
       j = float(gl_WorkGroupID.x);
