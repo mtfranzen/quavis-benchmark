@@ -1,7 +1,23 @@
 #!/bin/bash
 TEST_CASES_PATH=data/test-cases
 
-OCTAHEDRON_RADIUS="1 20 50"
+# WIDE-TRIANGLE TEST CASE
+## OBJ
+OBJ_PATH=$TEST_CASES_PATH/wide_triangle.obj
+rm -f $OBJ_PATH* > /dev/null
+echo v 1 1 0 >> $OBJ_PATH
+echo v -1 1 0 >> $OBJ_PATH
+echo v 0 0.01 0.001 >> $OBJ_PATH
+echo vn 1 1 1 >> $OBJ_PATH
+echo f 1//1 2//1 3//1 >> $OBJ_PATH
+## INPUT
+echo 0 0 0 >> $OBJ_PATH.in
+## OUTPUT
+echo 0 0 0 0.0826628 >> $OBJ_PATH.spherical_area.out
+echo 0 0 0 0 >> $OBJ_PATH.volume.out
+
+# OCTAHEDRON TEST CASE
+OCTAHEDRON_RADIUS="1"
 OCTAHEDRON_THETA_X=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
 OCTAHEDRON_THETA_Y=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
 OCTAHEDRON_THETA_Z=$(python -c "from math import *; print ' '.join(map(str, [x/4.0*pi for x in range(1)]))")
@@ -27,7 +43,7 @@ do
         done
 
         # TODO normals
-        echo vn 0.0 0.0 0.0 >> $OBJ_PATH
+        echo vn 1.0 1.0 1.0 >> $OBJ_PATH
 
         # faces
         for i in 1 4

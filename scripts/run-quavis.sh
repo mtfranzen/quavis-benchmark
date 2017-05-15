@@ -13,13 +13,13 @@ OUTPUT_FILE=output/output.csv
 FUNCTIONS="spherical_area volume"
 
 # arguments
-RMAX="10000" # DO NOT CHANGE THIS!
-ALPHAS="1 0.1 0.01"
-GEOM_OFF="1 0"
-TESS_OFF="1 0"
+RMAX="10" # DO NOT CHANGE THIS!
+ALPHAS="0.01"
+GEOM_OFF="0"
+TESS_OFF="0"
 REPEATS="1000"
-WIDTHS_SPHERICAL="2048 1024 512"
-WIDTHS_CUBE="512 256 128"
+WIDTHS_SPHERICAL="1024"
+WIDTHS_CUBE="256"
 
 # compute total number of combinations for display
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)
@@ -36,7 +36,7 @@ rm -f $OUTPUT_FILE >> /dev/null
 
 # Running spherical benchmark
 i=1
-echo "MAPPING;FUNCTION;OBJ;REPEATS;RMAX;ALPHA;GEOM_OFF?;TESS_OFF?;WIDTH;X;Y;Z;EXPECTED_RESULT;ACTUAL_RESULT;GRAPHICS_FPS;COMPUTE_FPS;" >> $OUTPUT_FILE
+echo "MAPPING;FUNCTION;OBJ;WIDTH;REPEATS;RMAX;ALPHA;GEOM_OFF?;TESS_OFF?;X;Y;Z;EXPECTED_RESULT;ACTUAL_RESULT;GRAPHICS_FPS;COMPUTE_FPS;" >> $OUTPUT_FILE
 for function in $FUNCTIONS
 do
   for alpha in $ALPHAS
@@ -59,7 +59,7 @@ do
                 RESULT=$($SPHERICAL_QUAVIS_PATH -s $SPHERICAL_SHADERS_PATH/$function.1.comp.spv -t $SPHERICAL_SHADERS_PATH/$function.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
                 paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
                 do
-                  echo "SPHERICAL;$function;${testcase##*/};$repeat;$rmax;$geom;$tess;$width;$alpha;$line" >> $OUTPUT_FILE
+                  echo "SPHERICAL;$function;${testcase##*/};$width;$repeat;$rmax;$geom;$tess;$alpha;$line" >> $OUTPUT_FILE
                 done
                 i=$(echo $i+1 | bc)
               done
@@ -79,27 +79,21 @@ do
   do
     for rmax in $RMAX
     do
-      for geom in $GEOM_OFF
+      for width in $WIDTHS_CUBE
+      do
+        for testcase in $TEST_CASES_PATH/*.obj
         do
-          for tess in $TESS_OFF
+          echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
+          workgroups=$width
+          EXPECTED=$(cat $testcase.$function.out | sed "s/ /;/g")
+          RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/$function.1.comp.spv -d 1 -t $CUBE_SHADERS_PATH/$function.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
+          paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
           do
-            for width in $WIDTHS_CUBE
-            do
-              for testcase in $TEST_CASES_PATH/*.obj
-              do
-                echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
-                workgroups=$width
-                EXPECTED=$(cat $testcase.$function.out | sed "s/ /;/g")
-                RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/$function.1.comp.spv -t $CUBE_SHADERS_PATH/$function.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
-                paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
-                do
-                  echo "CUBE;$function;${testcase##*/};$repeat;$rmax;$geom;$tess;$width;;$line" >> $OUTPUT_FILE
-                done
-                i=$(echo $i+1 | bc)
-              done
-            done
+            echo "CUBE;$function;${testcase##*/};$width;$repeat;$rmax;;;;;$line" >> $OUTPUT_FILE
           done
+          i=$(echo $i+1 | bc)
         done
+      done
       done
     done
   done
