@@ -18,8 +18,8 @@ ALPHAS="0.01"
 GEOM_OFF="0"
 TESS_OFF="0"
 REPEATS="1000"
-WIDTHS_SPHERICAL="1024"
-WIDTHS_CUBE="256"
+WIDTHS_SPHERICAL="2048"
+WIDTHS_CUBE="512"
 
 # compute total number of combinations for display
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)

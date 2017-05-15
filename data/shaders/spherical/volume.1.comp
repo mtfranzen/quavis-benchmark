@@ -1,7 +1,7 @@
 #version 450
 // image settings
-#define WIDTH 1024 // each work item covers a patch of size (W/N)x(H/M)
-#define HEIGHT 512
+#define WIDTH 2048 // each work item covers a patch of size (W/N)x(H/M)
+#define HEIGHT 1024
 
 // local dimensions
 #define N_LOCAL 16 // the number of local work items on the x-axis
@@ -26,14 +26,14 @@ shared float tmp_local[N_LOCAL];
 
 void main()
 {
-  float weight = sin(float(gl_WorkGroupID.x)*INVHEIGHTPI);
+  float weight = sin(float(gl_WorkGroupID.x)*INVHEIGHTPI)/float(HEIGHT)/float(WIDTH)*2*PI*PI/3.0;
 
   // compute sum per item
   uint xpos = gl_LocalInvocationID.x * CHUNKSIZE;
   float tmp = 0.0;
   for (uint x = xpos; x < xpos + CHUNKSIZE; x++) {
-    float tmp2 = imageLoad(inputImage, ivec2(x, gl_WorkGroupID.x)).x;
-    if (tmp2 < R_MAX) tmp += weight*tmp2*tmp2*tmp2;
+    float tmp2 = R_MAX*imageLoad(inputImage, ivec2(x, gl_WorkGroupID.x)).x;
+    tmp += weight*tmp2*tmp2;
   }
   tmp_local[gl_LocalInvocationID.x] = tmp;
   barrier();

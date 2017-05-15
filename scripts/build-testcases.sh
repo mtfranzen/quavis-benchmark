@@ -13,7 +13,7 @@ echo f 1//1 2//1 3//1 >> $OBJ_PATH
 ## INPUT
 echo 0 0 0 >> $OBJ_PATH.in
 ## OUTPUT # TODO: Compute correct volume/spherical area
-echo 0 0 0 0>> $OBJ_PATH.spherical_area.out
+echo 0 0 0 0.0826248813482 >> $OBJ_PATH.spherical_area.out
 echo 0 0 0 0 >> $OBJ_PATH.volume.out
 
 # OCTAHEDRON TEST CASE
