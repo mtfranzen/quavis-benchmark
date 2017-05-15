@@ -1,0 +1,4 @@
+spherical/bin/*
+cube/bin/*
+spherical/include/quavis/shaders.h
+cube/include/quavis/shaders.h
