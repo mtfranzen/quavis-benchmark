@@ -7,13 +7,13 @@ OBJ_PATH=$TEST_CASES_PATH/wide_triangle.obj
 rm -f $OBJ_PATH* > /dev/null
 echo v 1 1 0 >> $OBJ_PATH
 echo v -1 1 0 >> $OBJ_PATH
-echo v 0 0.01 0.001 >> $OBJ_PATH
+echo v 0 0.0.001 1 >> $OBJ_PATH
 echo vn 1 1 1 >> $OBJ_PATH
 echo f 1//1 2//1 3//1 >> $OBJ_PATH
 ## INPUT
 echo 0 0 0 >> $OBJ_PATH.in
 ## OUTPUT # TODO: Compute correct volume/spherical area
-echo 0 0 0 0.0826248813482 >> $OBJ_PATH.spherical_area.out
+echo 0 0 0 1.56938261347 >> $OBJ_PATH.spherical_area.out
 echo 0 0 0 0 >> $OBJ_PATH.volume.out
 
 # OCTAHEDRON TEST CASE
