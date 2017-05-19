@@ -14,9 +14,9 @@ FUNCTIONS="spherical_area volume"
 
 # arguments
 RMAX="10000.0"
-ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,101)]))")
-GEOM_OFF="0"
-TESS_OFF="0"
+ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,20)]))")
+GEOM_OFF="0 1"
+TESS_OFF="0 1"
 REPEATS="1000"
 WIDTHS_SPHERICAL="2048 1536 1024 768 512 256"
 WIDTHS_CUBE="512 384 256 192 128 96 64"
