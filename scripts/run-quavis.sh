@@ -18,8 +18,8 @@ ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in r
 GEOM_OFF="0 1"
 TESS_OFF="0 1"
 REPEATS="1000"
-WIDTHS_SPHERICAL="2048 1024 512 256 128 64"
-WIDTHS_CUBE="2048 1042 512 256 128 64"
+WIDTHS_SPHERICAL="2048 1024 512 256 128 64 32 16"
+WIDTHS_CUBE="1024 512 256 128 64 32 16"
 
 # compute total number of combinations for display
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)
