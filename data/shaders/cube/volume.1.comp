@@ -35,14 +35,14 @@ void main()
       j = float(gl_WorkGroupID.x);
       n = float(WIDTH);
       m = float(HEIGHT);
-      float weight = 4.0f/n/m/sqrt(pow((3.0f + 4.0f*j*(j-m)/m/m + 4.0f*i*(i-n)/n/n), 3.0f));
+      float weight =  4.0f/n/m/sqrt(pow((3.0f + 4.0f*j*(j-m)/m/m + 4.0f*i*(i-n)/n/n), 3.0f));
 
-      float d0 = R_MAX*imageLoad(inputImage0, ivec2(x, gl_WorkGroupID.x)).x;
-      float d1 = R_MAX*imageLoad(inputImage1, ivec2(x, gl_WorkGroupID.x)).x;
-      float d2 = R_MAX*imageLoad(inputImage2, ivec2(x, gl_WorkGroupID.x)).x;
-      float d3 = R_MAX*imageLoad(inputImage3, ivec2(x, gl_WorkGroupID.x)).x;
-      float d4 = R_MAX*imageLoad(inputImage4, ivec2(x, gl_WorkGroupID.x)).x;
-      float d5 = R_MAX*imageLoad(inputImage5, ivec2(x, gl_WorkGroupID.x)).x;
+      float d0 = pow(R_MAX*imageLoad(inputImage0, ivec2(x, gl_WorkGroupID.x)).x, 3);
+      float d1 = pow(R_MAX*imageLoad(inputImage1, ivec2(x, gl_WorkGroupID.x)).x, 3);
+      float d2 = pow(R_MAX*imageLoad(inputImage2, ivec2(x, gl_WorkGroupID.x)).x, 3);
+      float d3 = pow(R_MAX*imageLoad(inputImage3, ivec2(x, gl_WorkGroupID.x)).x, 3);
+      float d4 = pow(R_MAX*imageLoad(inputImage4, ivec2(x, gl_WorkGroupID.x)).x, 3);
+      float d5 = pow(R_MAX*imageLoad(inputImage5, ivec2(x, gl_WorkGroupID.x)).x, 3);
 
       tmp += (d0+d1+d2+d3+d4+d5)*weight/3.0f;
   }
