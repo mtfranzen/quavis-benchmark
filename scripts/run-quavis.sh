@@ -14,12 +14,12 @@ FUNCTIONS="spherical_area volume"
 
 # arguments
 RMAX="10000.0"
-ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,20)]))")
+ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,301,10)]))")
 GEOM_OFF="0 1"
 TESS_OFF="0 1"
 REPEATS="1000"
-WIDTHS_SPHERICAL="2048 1536 1024 768 512 256"
-WIDTHS_CUBE="512 384 256 192 128 96 64"
+WIDTHS_SPHERICAL="2048 1024 512 256 128 64"
+WIDTHS_CUBE="2048 1042 512 256 128 64"
 
 # compute total number of combinations for display
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)
