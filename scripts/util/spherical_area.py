@@ -4,9 +4,9 @@ import numpy as np
 
 angle = lambda p,q: np.arccos(np.dot(p,q)/np.linalg.norm(p)/np.linalg.norm(q))
 
-p1 = np.asarray([1,1,0])
-p2 = np.asarray([-1,1,0])
-p3 = np.asarray([0,0.001,1])
+p1 = np.asarray([-1,0,1])
+p2 = np.asarray([1,0,1])
+p3 = np.asarray([0,1,0.001])
 
 a = angle(p1,p2)
 b = angle(p2,p3)
