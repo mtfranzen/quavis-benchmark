@@ -5,9 +5,9 @@ TEST_CASES_PATH=data/test-cases
 ## OBJ
 OBJ_PATH=$TEST_CASES_PATH/wide_triangle.obj
 rm -f $OBJ_PATH* > /dev/null
-echo v 1 1 0 >> $OBJ_PATH
-echo v -1 1 0 >> $OBJ_PATH
-echo v 0 0.0.001 1 >> $OBJ_PATH
+echo v -1 0 1 >> $OBJ_PATH
+echo v 1 0 1 >> $OBJ_PATH
+echo v 0 1 0.001 >> $OBJ_PATH
 echo vn 1 1 1 >> $OBJ_PATH
 echo f 1//1 2//1 3//1 >> $OBJ_PATH
 ## INPUT
