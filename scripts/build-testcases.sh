@@ -58,7 +58,7 @@ do
         done
 
         # observation points
-        echo "0 0 0" >> $OBJ_PATH.in
+        echo "0.1 0.1 0.1" >> $OBJ_PATH.in
 
         # correct result
         A=$(python -c "import math;print math.sqrt(2)*$R") # edge length
