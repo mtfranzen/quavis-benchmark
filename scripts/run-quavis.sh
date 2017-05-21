@@ -32,7 +32,7 @@ TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $TESS_OFF | grep -o
 TOTAL_COMB_CUBE=$(echo "$TOTAL_COMB*(1+$(echo $WIDTHS_CUBE | grep -o ' ' | wc -l))" | bc)
 
 # Removing old output file and shaders
-rm -f $OUTPUT_FILE >> /dev/null
+#rm -f $OUTPUT_FILE >> /dev/null
 rm -f $SPHERICAL_SHADERS_PATH/auto* >> /dev/null
 
 # Create and compile spherical shaders
@@ -105,7 +105,7 @@ do
           do
             for width in $WIDTHS_SPHERICAL
             do
-              for testcase in $TEST_CASES_PATH/*.obj
+              for testcase in $TEST_CASES_PATH/*.geojson
               do
                 echo "Running Spherical..." $i/$TOTAL_COMB_SPHERICAL
                 workgroups=$(echo $width/2 | bc)
@@ -135,7 +135,7 @@ do
     do
       for width in $WIDTHS_CUBE
       do
-        for testcase in $TEST_CASES_PATH/*.obj
+        for testcase in $TEST_CASES_PATH/*.geojson
         do
           echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
           workgroups=$width
