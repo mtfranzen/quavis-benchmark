@@ -9,24 +9,28 @@ TEST_CASES_PATH=data/test-cases
 OUTPUT_FILE_OBJ=output/output.csv
 OUTPUT_FILE_GEOJSON=output/output.geojson.csv
 
-# two shaders we test:
-# TODO: Area
+# Here, we specify the combinations for which the test is being run
+# The functions used to evaluate each test case (see the computeshaders in data/shaders)
 FUNCTIONS="spherical_area volume"
-
-# arguments
+# The maximum rendering distances
 RMAX="10000.0"
+# The different alpha values
 ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,301,10)]))")
+# Handling degenrate primitives on/off
 GEOM_OFF="0 1"
+# Tessellation on/off
 TESS_OFF="0 1"
+# The number of times each point is rendered (for all benchmarks, used to average FPS)
 REPEATS="100"
+# The resolutions (width x width/2) the equirectangular map is tested
 WIDTHS_SPHERICAL="2048 1024 512 256 128 64 32 16"
+# The resolutions (width x width) with which the cubemap is tested
 WIDTHS_CUBE="1024 512 256 128 64 32 16"
 
 # compute total number of test run combinations
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)
 TOTAL_COMB=$(echo "$TOTAL_COMB*(1+$(echo $REPEATS | grep -o ' ' | wc -l))" | bc)
-TOTAL_COMB=$(echo "$TOTAL_COMB*$(ls $TEST_CASES_PATH/*.obj | wc -l)" | bc)
-TOTAL_COMB=$(echo "$TOTAL_COMB+$(ls $TEST_CASES_PATH/*.geojson | wc -l)" | bc)
+TOTAL_COMB=$(echo "$TOTAL_COMB*($(ls $TEST_CASES_PATH/*.obj | wc -l) + $(ls $TEST_CASES_PATH/*.geojson | wc -l))" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB*(1+$(echo $WIDTHS_SPHERICAL | grep -o ' ' | wc -l))" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $ALPHAS | grep -o ' ' | wc -l))" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $GEOM_OFF | grep -o ' ' | wc -l))" | bc)
@@ -34,10 +38,11 @@ TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $TESS_OFF | grep -o
 TOTAL_COMB_CUBE=$(echo "$TOTAL_COMB*(1+$(echo $WIDTHS_CUBE | grep -o ' ' | wc -l))" | bc)
 
 # Removing old output file and shaders
-#rm -f $OUTPUT_FILE >> /dev/null
+rm -f $OUTPUT_FILE_OBJ >> /dev/null
+rm -f $OUTPUT_FILE_GEOJSON >> /dev/null
 rm -f $SPHERICAL_SHADERS_PATH/auto* >> /dev/null
 
-# Create and compile spherical shaders
+# Create and compile shaders for the equirectangular map
 for rmax in $RMAX
 do
   for function in $FUNCTIONS
@@ -64,7 +69,7 @@ do
   done
 done
 
-# Create and compile cubemap shaders
+# Create and compile shaders for the cubemap
 for rmax in $RMAX
 do
   for function in $FUNCTIONS

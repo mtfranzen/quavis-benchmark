@@ -1,0 +1,91 @@
+<h1>Requirements for the application &amp; the benchmark</h1>
+
+<ul>
+<li>libglm-dev</li>
+<li>libvulkan-dev</li>
+<li><a href="https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/tools/glslang/Install/">GlslangValidator</a></li>
+</ul>
+
+<h1>Running the benchmark (tested on Ubuntu 16.04)</h1>
+
+<p>The benchmark script will automatically produce all necessary raw data, shaders and binaries used to create the figures in the paper. It can be executed with the parameter space used in the paper using the command <code>bash run.sh</code>.</p>
+
+<p>It will create two output files:</p>
+
+<ul>
+<li><code>output/output.csv</code> for the octahedron and the triangle test case.</li>
+<li><code>output/output.geojson.csv</code> for the performance benchmark test case.</li>
+</ul>
+
+<p>Each row in the CSV contains the following rows:</p>
+
+<ul>
+<li><code>MAPPING</code>: The mapping used for the test (either <code>SPHERICAL</code> for the equirectangular projection, or <code>CUBE</code> for the cubemap)</li>
+<li><code>FUNCTION</code>: The function evaluated in the compute shader (either <code>spherical_area</code> or <code>volume</code>)</li>
+<li><code>OBJ</code>: The test case name</li>
+<li><code>WIDTH</code>: The resolution (width). For the equirectangular mapping, height:=0.5*width. For the cubemap, height:=width</li>
+<li><code>REPEATS</code>: The number of times a point was tested (it is used to average the performance)</li>
+<li><code>RMAX</code>: The maximum rendering distance</li>
+<li><code>GEOM_OFF?</code>: 1 iff the handling of degenerate primitives has been disabled</li>
+<li><code>TESS_OFF?</code>: 1 iff the tessellation has been disabled</li>
+<li><code>ALPHA</code>: The alpha constant used to control the tessellation and bound the error</li>
+<li><code>X</code>: The x-coordinate of the point being tested</li>
+<li><code>Y</code>: The Y-coordinate of the point being tested</li>
+<li><code>Z</code>: The z-coordinate of the point being tested</li>
+<li><code>EXPECTED_RESULT</code>: The expected result for the test-case. This value is correct in two instances:
+<ul>
+<li><code>FUNCTION=spherical_area,OBJ=wide_triangle.obj</code></li>
+<li><code>FUNCTION=volume,OBJ=octahedron.1.0.0.0.0.obj</code></li>
+</ul></li>
+<li><code>ACTUAL_RESULT</code>: The result computed with our application</li>
+<li><code>GRAPHICS_FPS</code>: The average rendering FPS over the number of trials (column <code>REPEATS</code>)</li>
+<li><code>COMPUTE_FPS</code>: The average computing FPS over the number of trials (column <code>REPEATS</code>)</li>
+</ul>
+
+<h1>Running the application as standalone</h1>
+
+<p>If you want to use the application yourself e.g. to produce rendered images, first compile
+the two applications using the following command:
+ * <code>bash scripts/build-quavis.sh</code></p>
+
+<ol>
+<li>Compile the compute shader you want to use to SPIR-V (using the glslangValidator). The easiest way is to use one provided by the benchmark.</li>
+<li>Run the analysis <code>quavis/spherical/bin/quavis-generic-service</code> where
+<ul>
+<li><code>-a</code> is the maxium angle in radians</li>
+<li><code>-r</code> is the maximum visible distance</li>
+<li><code>-s</code> is the first-stage compute shader (aggregating row-wise)</li>
+<li><code>-t</code> is the second-stage compute shader (aggregating column-wise)</li>
+<li><code>-f</code> is the geojson file to be analysid</li>
+<li><code>-d 1</code> set to 1 to store debug images into the <code>images/</code> folder. Note that the results become wrong in this mode</li>
+<li><code>-l 1</code> set to 1 to store the images with lines-only (no filling)</li>
+<li><code>-u &lt;n&gt;</code> the number of times each point should be benchmarked</li>
+<li><code>-x</code> the width</li>
+<li><code>-w</code> the workgroup size for the compute shader (this should be width/2)</li>
+<li><code>-G 1</code> to disable the geom-shader</li>
+<li><code>-T 1</code> to disable the tess-shader</li>
+<li><em>stdin</em> is the list of observation points in the format
+```
+x1 y1 z1
+x2 y2 z2
+...</li>
+</ul></li>
+</ol>
+
+<p>Example:</p>
+
+<p><code>glslangValidator -V quavis/spherical/examples/shaders/shader.area.comp -o quavis/spherical/examples/shaders/shader.area.comp.spv</code></p>
+
+<p><code>glslangValidator -V quavis/spherical/examples/shaders/shader.2.area.comp -o quavis/spherical/examples/shaders/shader.2.area.comp.spv</code></p>
+
+<p><code>quavis/spherical/bin/quavis-generic-service -s "quavis/spherical/examples/shaders/shader.area.comp.spv" -t "quavis/spherical/examples/shaders/shader.2.area.comp.spv" -f "quavis/spherical/examples/data/mooctask.geojson" -d 1 -a 0.1 -r 100.0 -x 1024 -w 512 -u 10 &lt; quavis/spherical/examples/data/mooktask_grid.txt</code></p>
+
+<h1>Running the cubemap as standalone</h1>
+
+<p>Proceed exactly the same as with the equirectangular map above, but use the directory <code>quavis/cube/</code> instead:</p>
+
+<p><code>glslangValidator -V quavis/cube/examples/shaders/shader.area.comp -o quavis/spherical/examples/shaders/shader.area.comp.spv</code></p>
+
+<p><code>glslangValidator -V quavis/cube/examples/shaders/shader.2.area.comp -o quavis/cube/examples/shaders/shader.2.area.comp.spv</code></p>
+
+<p><code>quavis/cube/bin/quavis-generic-service -s "quavis/cube/examples/shaders/shader.area.comp.spv" -t "quavis/cube/examples/shaders/shader.2.area.comp.spv" -f "quavis/cube/examples/data/mooctask.geojson" -d 1 -a 0.1 -r 100.0 -x 512 -w 512 -u 10 &lt; quavis/cube/examples/data/mooktask_grid.txt</code></p>
