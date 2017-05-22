@@ -6,7 +6,8 @@ CUBE_QUAVIS_PATH=quavis/cube/bin/quavis-generic-service
 CUBE_SHADERS_PATH=data/shaders/cube
 
 TEST_CASES_PATH=data/test-cases
-OUTPUT_FILE=output/output.csv
+OUTPUT_FILE_OBJ=output/output.csv
+OUTPUT_FILE_GEOJSON=output/output.geojson.csv
 
 # two shaders we test:
 # TODO: Area
@@ -17,14 +18,15 @@ RMAX="10000.0"
 ALPHAS=$(python -c "from math import *; print ' '.join(map(str, [pi/x for x in range(1,301,10)]))")
 GEOM_OFF="0 1"
 TESS_OFF="0 1"
-REPEATS="1000"
+REPEATS="100"
 WIDTHS_SPHERICAL="2048 1024 512 256 128 64 32 16"
 WIDTHS_CUBE="1024 512 256 128 64 32 16"
 
-# compute total number of combinations for display
+# compute total number of test run combinations
 TOTAL_COMB=$(echo 1+$(echo $FUNCTIONS | grep -o ' ' | wc -l) | bc)
 TOTAL_COMB=$(echo "$TOTAL_COMB*(1+$(echo $REPEATS | grep -o ' ' | wc -l))" | bc)
 TOTAL_COMB=$(echo "$TOTAL_COMB*$(ls $TEST_CASES_PATH/*.obj | wc -l)" | bc)
+TOTAL_COMB=$(echo "$TOTAL_COMB+$(ls $TEST_CASES_PATH/*.geojson | wc -l)" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB*(1+$(echo $WIDTHS_SPHERICAL | grep -o ' ' | wc -l))" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $ALPHAS | grep -o ' ' | wc -l))" | bc)
 TOTAL_COMB_SPHERICAL=$(echo "$TOTAL_COMB_SPHERICAL*(1+$(echo $GEOM_OFF | grep -o ' ' | wc -l))" | bc)
@@ -90,7 +92,8 @@ done
 
 # Running spherical benchmark
 i=1
-echo "MAPPING;FUNCTION;OBJ;WIDTH;REPEATS;RMAX;GEOM_OFF?;TESS_OFF?;ALPHA;X;Y;Z;EXPECTED_RESULT;ACTUAL_RESULT;GRAPHICS_FPS;COMPUTE_FPS;" >> $OUTPUT_FILE
+echo "MAPPING;FUNCTION;OBJ;WIDTH;REPEATS;RMAX;GEOM_OFF?;TESS_OFF?;ALPHA;X;Y;Z;EXPECTED_RESULT;ACTUAL_RESULT;GRAPHICS_FPS;COMPUTE_FPS;" >> $OUTPUT_FILE_OBJ
+echo "MAPPING;FUNCTION;OBJ;WIDTH;REPEATS;RMAX;GEOM_OFF?;TESS_OFF?;ALPHA;X;Y;Z;EXPECTED_RESULT;ACTUAL_RESULT;GRAPHICS_FPS;COMPUTE_FPS;" >> $OUTPUT_FILE_GEOJSON
 for function in $FUNCTIONS
 do
   for alpha in $ALPHAS
@@ -105,6 +108,21 @@ do
           do
             for width in $WIDTHS_SPHERICAL
             do
+              # Run OBJs
+              for testcase in $TEST_CASES_PATH/*.obj
+              do
+                echo "Running Spherical..." $i/$TOTAL_COMB_SPHERICAL
+                workgroups=$(echo $width/2 | bc)
+                EXPECTED=$(cat $testcase.$function.out | sed "s/ /;/g")
+                RESULT=$($SPHERICAL_QUAVIS_PATH -s $SPHERICAL_SHADERS_PATH/auto_$function.$width.$rmax.1.comp.spv -t $SPHERICAL_SHADERS_PATH/auto_$function.$width.$rmax.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
+                paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
+                do
+                  echo "SPHERICAL;$function;${testcase##*/};$width;$repeat;$rmax;$geom;$tess;$alpha;$line" >> $OUTPUT_FILE_OBJ
+                done
+                i=$(echo $i+1 | bc)
+              done
+
+              # Run Geojson
               for testcase in $TEST_CASES_PATH/*.geojson
               do
                 echo "Running Spherical..." $i/$TOTAL_COMB_SPHERICAL
@@ -113,7 +131,7 @@ do
                 RESULT=$($SPHERICAL_QUAVIS_PATH -s $SPHERICAL_SHADERS_PATH/auto_$function.$width.$rmax.1.comp.spv -t $SPHERICAL_SHADERS_PATH/auto_$function.$width.$rmax.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
                 paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
                 do
-                  echo "SPHERICAL;$function;${testcase##*/};$width;$repeat;$rmax;$geom;$tess;$alpha;$line" >> $OUTPUT_FILE
+                  echo "SPHERICAL;$function;${testcase##*/};$width;$repeat;$rmax;$geom;$tess;$alpha;$line" >> $OUTPUT_FILE_GEOJSON
                 done
                 i=$(echo $i+1 | bc)
               done
@@ -135,6 +153,19 @@ do
     do
       for width in $WIDTHS_CUBE
       do
+        for testcase in $TEST_CASES_PATH/*.obj
+        do
+          echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
+          workgroups=$width
+          EXPECTED=$(cat $testcase.$function.out | sed "s/ /;/g")
+          RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/auto_$function.$width.$rmax.1.comp.spv -t $CUBE_SHADERS_PATH/auto_$function.$width.$rmax.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
+          paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
+          do
+            echo "CUBE;$function;${testcase##*/};$width;$repeat;$rmax;;;;$line" >> $OUTPUT_FILE_OBJ
+          done
+          i=$(echo $i+1 | bc)
+        done
+
         for testcase in $TEST_CASES_PATH/*.geojson
         do
           echo "Running Cubemap..." $i/$TOTAL_COMB_CUBE
@@ -143,7 +174,7 @@ do
           RESULT=$($CUBE_QUAVIS_PATH -s $CUBE_SHADERS_PATH/auto_$function.$width.$rmax.1.comp.spv -t $CUBE_SHADERS_PATH/auto_$function.$width.$rmax.2.comp.spv -G $geom -T $tess -x $width -w $workgroups -a $alpha -u $repeat -r $rmax -f $testcase < $testcase.in | tail -n +2 | cut -d " " -f4-7 | sed "s/ /;/g")
           paste -d';' <(echo "$EXPECTED") <(echo "$RESULT") | while read line;
           do
-            echo "CUBE;$function;${testcase##*/};$width;$repeat;$rmax;;;;$line" >> $OUTPUT_FILE
+            echo "CUBE;$function;${testcase##*/};$width;$repeat;$rmax;;;;$line" >> $OUTPUT_FILE_GEOJSON
           done
           i=$(echo $i+1 | bc)
         done
